@@ -14,6 +14,7 @@ use Workerman\Protocols\Http\Chunk;
 use Workerman\Protocols\Http\ServerSentEvents;
 use Workerman\Timer;
 use function \Workbunny\WebmanCoroutine\sleep;
+use function Workbunny\WebmanCoroutine\is_coroutine_env;
 
 #[Component]
 class IndexServiceImpl implements IndexService
@@ -24,11 +25,7 @@ class IndexServiceImpl implements IndexService
     public function index(string $v): Response
     {
 //        dump(Route::getRoutes());
-        return json([
-            'code' => 200,
-            'message' => 'success',
-            'data' => "IndexServiceImpl::abc=" . $this->abc . ',inject abcd=' . $v,
-        ]);
+        return success("IndexServiceImpl::abc=" . $this->abc . ',inject abcd=' . $v);
     }
 
     public function sse(): Response
@@ -36,7 +33,7 @@ class IndexServiceImpl implements IndexService
         $connection = request()->connection;
         $waitGroup = new WaitGroup();
         $waitGroup->add(30);
-        for ($i = 1; $i <= 30; $i++) {
+        for ($i = 0; $i < $waitGroup->count(); $i++) {
             /** @var Coroutine[] $coroutine */
             $coroutine[$i] = new Coroutine(function () use ($waitGroup, $connection, $i, &$coroutine) {
                 sleep(0.1 * $i);
@@ -69,12 +66,13 @@ class IndexServiceImpl implements IndexService
         $connection->onClose = function () use($timer_id, &$coroutine) {
             Timer::del($timer_id);
             foreach ($coroutine as $weakMap) {
+                print_r($weakMap->origin());
                 $weakMap->kill($weakMap);
             }
-            foreach ($weakMap->getCoroutinesWeakMap()->getIterator() as $value) {
-                [$seconds, $microseconds] = explode('.', $value['startTime']);
-                echo '[协程] [' . $value['id'] . '] ' . date('Y-m-d H:i:s', $seconds) . ' ' . $microseconds . PHP_EOL;
-            }
+//            foreach ($weakMap->getCoroutinesWeakMap()->getIterator() as $value) {
+//                [$seconds, $microseconds] = explode('.', $value['startTime']);
+//                echo '[协程] [' . $value['id'] . '] ' . date('Y-m-d H:i:s', $seconds) . ' ' . $microseconds . PHP_EOL;
+//            }
         };
 
         return response("\r\n")->withHeaders([
@@ -87,7 +85,7 @@ class IndexServiceImpl implements IndexService
         $connection = request()->connection;
         $waitGroup = new WaitGroup();
         $waitGroup->add(30);
-        for ($i = 1; $i <= 30; $i++) {
+        for ($i = 0; $i < $waitGroup->count(); $i++) {
             $coroutine = new Coroutine(function () use ($waitGroup, $connection, $i) {
                 sleep(0.1 * $i);
                 $connection->send(new Chunk($i . " "));
@@ -111,8 +109,8 @@ class IndexServiceImpl implements IndexService
         //tcp关闭连接后立刻停止协程
         $connection->onClose = function () use($timer_id, &$coroutine) {
             Timer::del($timer_id);
-            foreach ($coroutine as $unset) {
-                $unset->getCoroutineInterface()->kill(new \Exception);
+            foreach ($coroutine as $weakMap) {
+                $weakMap->kill($weakMap);
             }
         };
 
@@ -125,39 +123,6 @@ class IndexServiceImpl implements IndexService
     public function mysql(): Response
     {
         return json(Db::table("api_call")->get());
-    }
-
-    function php(string $str): Response
-    {
-        $result = [
-            'output' => '',
-            'error' => '',
-            'runningTime' => 0,
-        ];
-        $str = base64_decode($str);
-        $str = str_replace("\"", "\\\"", $str);
-        $cmd = "docker run --rm -iu nobody -w /opt:ro php php -r \"$str\"";
-        docker_it($cmd, '', $result['output'], $result['error'], $result['runningTime']);
-        return json($result);
-    }
-
-    function java(string $code, string $input): Response
-    {
-        $result = [
-            'output' => '',
-            'error' => '',
-            'runningTime' => 0,
-        ];
-        $code = base64_decode($code);
-        $codeDir = runtime_path('/cache/code/java/id/');
-        if (!is_dir($codeDir)) {
-            mkdir($codeDir, 0777, true);
-        }
-        file_put_contents($codeDir . 'Main.java', $code);
-        $cmd = "docker run --rm -iu nobody -v $codeDir:/opt:ro -w /opt openjdk bash -c \"java Main.java\"";
-        docker_it($cmd, $input, $result['output'], $result['error'], $result['runningTime']);
-        unlink($codeDir . 'Main.java');
-        return json($result);
     }
 
 }

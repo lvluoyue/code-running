@@ -2,7 +2,6 @@
 
 /**
  * Created by PhpStorm.
- * User: LinFei
  * Created time 2022/10/10 10:57:15
  * E-mail: fly@eyabc.cn
  */
@@ -29,7 +28,16 @@ return [
         'handle' => LinFly\Annotation\Validate\Handle\ThinkValidate::class,
         // 验证失败处理方法
         'fail_handle' => function (Webman\Http\Request $request, string $message) {
-            return json(['code' => 500, 'msg' => $message]);
-        }
+            return message(\app\utils\ResultCode::VALITATE, null, $message);
+        },
+
+        // 注解验证器 @Validate() 未填写验证器类名时则通过命名空间拼接规则获取验证器类名
+        'auto_validate' => true,
+        // 验证器类名后缀
+        'auto_validate_suffix' => 'Validate',
+        // 自动验证器验证处理
+        // 'auto_validate_handle' => function (array $item): string {
+        //     return str_replace('\\controller\\', '\\validate\\', $item['class']);
+        // }
     ],
 ];

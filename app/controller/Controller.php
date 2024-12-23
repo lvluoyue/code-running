@@ -4,9 +4,7 @@ namespace app\controller;
 
 use app\service\IndexService;
 use DI\Attribute\Inject;
-use LinFly\Annotation\Attributes\Route\Middleware;
-use LinFly\Annotation\Attributes\Route\NamespaceController;
-use LinFly\Annotation\Attributes\Route\PostMapping;
+use LinFly\Annotation\Attributes\Route\GetMapping;
 use LinFly\Annotation\Attributes\Route\RequestMapping;
 use support\Request;
 use support\Response;
@@ -23,15 +21,40 @@ class Controller
         return $this->indexService->index($abc);
     }
 
-    #[PostMapping]
-    public function php(Request $request, string $code): Response
+    #[GetMapping]
+    public function sse(Request $request): Response
     {
-        return $this->indexService->php($code);
+        return $this->indexService->sse();
     }
 
-    #[PostMapping]
-    public function java(Request $request, string $code, string $input): Response
+    #[GetMapping]
+    public function chunked(Request $request): Response
     {
-        return $this->indexService->java($code, $input);
+        return $this->indexService->chunked();
     }
+
+    #[GetMapping]
+    public function mysql(Request $request): Response
+    {
+        return $this->indexService->mysql();
+    }
+
+    #[GetMapping("{id:\d+}")]
+    public function hello(int $id): string
+    {
+        return 'hello' . $id;
+    }
+
+    #[RequestMapping]
+    public function view(Request $request): Response
+    {
+        return view('index/view', ['name' => 'webman']);
+    }
+
+    #[RequestMapping]
+    public function json(Request $request): Response
+    {
+        return json(['code' => 0, 'msg' => 'ok']);
+    }
+
 }

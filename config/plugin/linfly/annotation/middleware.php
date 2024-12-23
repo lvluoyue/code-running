@@ -14,6 +14,6 @@
 
 return [
     '' => [
-        app\middleware\CrossDomain::class
+        LinFly\Annotation\Validate\ValidateMiddleware::class
     ]
 ];

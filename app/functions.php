@@ -3,8 +3,42 @@
  * Here is your custom functions.
  */
 
+use \app\annotation\Message;
+use \app\utils\ResultCode;
+
+if(!isset($MessageType)) {
+    static $MessageType = [];
+}
+
+if (!function_exists('message')) {
+    function message(\app\utils\ResultCode $code, mixed $data, ?string $message = null): \support\Response
+    {
+        if(!isset($message)) {
+            $reflection = new ReflectionEnum($code);
+            $reflectionConstant = $reflection->getReflectionConstant($code->name);
+            $attributes = current($reflectionConstant->getAttributes(Message::class));
+            $message = $attributes->newInstance()->message;
+        }
+        return json(['code' => $code->value, 'message' => $message, 'data' => $data]);
+    }
+}
+
+if (!function_exists('success')) {
+    function success(mixed $data): \support\Response
+    {
+        return message(ResultCode::SUCCESS, $data);
+    }
+}
+
+if (!function_exists('error')) {
+    function error(string $data): \support\Response
+    {
+        return message(ResultCode::ERROR, $data);
+    }
+}
+
 if (!function_exists('docker_it')) {
-    function docker_it(string $cmd, string $input, string &$output, string &$error, float &$runningTime = 0): void
+    function docker_it(string $cmd, ?string $input, string &$output, string &$error, float &$runningTime = 0): void
     {
         $descriptorspec = [
             0 => ['pipe', 'r'], // 标准输入

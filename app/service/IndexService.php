@@ -13,8 +13,4 @@ interface IndexService {
     function chunked(): Response;
 
     function mysql(): Response;
-
-    function php(string $str): Response;
-
-    function java(string $code, string $input): Response;
 }
