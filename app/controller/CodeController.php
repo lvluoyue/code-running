@@ -5,14 +5,12 @@ namespace app\controller;
 use app\service\CodeService;
 use app\validate\CodeValidate;
 use DI\Attribute\Inject;
-use LinFly\Annotation\Attributes\Route\NamespaceController;
 use LinFly\Annotation\Attributes\Route\Controller;
 use LinFly\Annotation\Attributes\Route\PostMapping;
 use LinFly\Annotation\Validate\Validate;
 use support\Request;
 use support\Response;
 
-//#[NamespaceController(__NAMESPACE__)]
 #[Controller("/code")]
 #[Validate(params: '$post', validate: CodeValidate::class)]
 class CodeController

@@ -13,6 +13,7 @@ use Workbunny\WebmanCoroutine\Utils\WaitGroup\WaitGroup;
 use Workerman\Protocols\Http\Chunk;
 use Workerman\Protocols\Http\ServerSentEvents;
 use Workerman\Timer;
+use Workerman\Worker;
 use function \Workbunny\WebmanCoroutine\sleep;
 use function Workbunny\WebmanCoroutine\is_coroutine_env;
 
@@ -24,8 +25,15 @@ class IndexServiceImpl implements IndexService
 
     public function index(string $v): Response
     {
-//        dump(Route::getRoutes());
-        return success("IndexServiceImpl::abc=" . $this->abc . ',inject abcd=' . $v);
+        $appName =  env('SERVER_APP_NAME', 'webman');
+        return success([
+            'app名称：' . $appName,
+            '操作系统：' . php_uname('s') . ' ' . php_uname('r'),
+            'PHP版本：' . PHP_VERSION,
+            'workerClass：' . config("process.$appName.workerClass"),
+            'workerman版本：' . Worker::VERSION,
+            'event库：' . Worker::getEventLoop()::class
+        ]);
     }
 
     public function sse(): Response

@@ -17,7 +17,7 @@ if (!function_exists('message')) {
             $reflection = new ReflectionEnum($code);
             $reflectionConstant = $reflection->getReflectionConstant($code->name);
             $attributes = current($reflectionConstant->getAttributes(Message::class));
-            $message = $attributes->newInstance()->message;
+            $message = $attributes->newInstance()->message . '，' . $message;
         }
         return json(['code' => $code->value, 'message' => $message, 'data' => $data]);
     }
@@ -34,6 +34,29 @@ if (!function_exists('error')) {
     function error(string $data): \support\Response
     {
         return message(ResultCode::ERROR, $data);
+    }
+}
+
+if (!function_exists('deleteDirectory')) {
+    function deleteDirectory($dir)
+    {
+        if (!is_dir($dir)) {
+            return false;
+        }
+
+        $dirIterator = new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS);
+        $iterator = new \RecursiveIteratorIterator($dirIterator, \RecursiveIteratorIterator::CHILD_FIRST);
+
+        foreach ($iterator as $file) {
+            if ($file->isDir()) {
+                rmdir($file->getPathname());
+            } else {
+                unlink($file->getPathname());
+            }
+        }
+
+        rmdir($dir);
+        return true;
     }
 }
 

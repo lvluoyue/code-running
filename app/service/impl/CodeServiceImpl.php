@@ -10,131 +10,94 @@ use support\Response;
 class CodeServiceImpl implements CodeService
 {
 
+    private $code_cache_path = '/cache/code';
+
     function php(string $code, ?string $input): Response
     {
-        $result = [
-            'output' => '',
-            'error' => '',
-            'runningTime' => 0,
-        ];
+        $image = 'php';
+        $bindPath = $this->getOrCreateDirectory(DIRECTORY_SEPARATOR . __FUNCTION__ . '/id');
+        $mainFile = 'Main.php';
         $code = base64_decode($code);
-        $codeDir = runtime_path('/cache/code/pthon/id/');
-        if (!is_dir($codeDir)) {
-            mkdir($codeDir, 0777, true);
-        }
-        file_put_contents($codeDir . 'Main.php', $code);
-        $cmd = "docker run --rm -iu nobody -v $codeDir:/opt:ro -w /opt php bash -c \"php Main.php\"";
-        docker_it($cmd, $input, $result['output'], $result['error'], $result['runningTime']);
-        unlink($codeDir . 'Main.php');
+        file_put_contents($bindPath . DIRECTORY_SEPARATOR . $mainFile, $code);
+        $result = $this->dockerRun($image, $bindPath, 'php ' . $mainFile, $input);
         return success($result);
     }
 
-//    function php(string $code, ?string $input): Response
-//    {
-//        $result = [
-//            'output' => '',
-//            'error' => '',
-//            'runningTime' => 0,
-//        ];
-//        $str = base64_decode($str);
-//        $str = str_replace("\"", "\\\"", $str);
-//        $cmd = "docker run --rm -iu nobody -w /opt:ro php php -r \"$str\"";
-//        docker_it($cmd, '', $result['output'], $result['error'], $result['runningTime']);
-//        return success($result);
-//    }
-
     function python(string $code, ?string $input): Response
     {
-        $result = [
-            'output' => '',
-            'error' => '',
-            'runningTime' => 0,
-        ];
+        $image = 'python';
+        $bindPath = $this->getOrCreateDirectory(DIRECTORY_SEPARATOR . __FUNCTION__ . '/id');
+        $mainFile = 'Main.py';
         $code = base64_decode($code);
-        $codeDir = runtime_path('/cache/code/pthon/id/');
-        if (!is_dir($codeDir)) {
-            mkdir($codeDir, 0777, true);
-        }
-        file_put_contents($codeDir . 'Main.py', $code);
-        $cmd = "docker run --rm -iu nobody -v $codeDir:/opt:ro -w /opt python bash -c \"python Main.py\"";
-        docker_it($cmd, $input, $result['output'], $result['error'], $result['runningTime']);
-        unlink($codeDir . 'Main.py');
+        file_put_contents($bindPath . DIRECTORY_SEPARATOR . $mainFile, $code);
+        $result = $this->dockerRun($image, $bindPath, 'python ' . $mainFile, $input);
         return success($result);
     }
 
     function golang(string $code, ?string $input): Response
     {
-        $result = [
-            'output' => '',
-            'error' => '',
-            'runningTime' => 0,
-        ];
+        $image = 'golang';
+        $bindPath = $this->getOrCreateDirectory(DIRECTORY_SEPARATOR . __FUNCTION__ . '/id');
+        $mainFile = 'Main.go';
         $code = base64_decode($code);
-        $codeDir = runtime_path('/cache/code/golang/id/');
-        if (!is_dir($codeDir)) {
-            mkdir($codeDir, 0777, true);
-        }
-        file_put_contents($codeDir . 'Main.go', $code);
-        $cmd = "docker run --rm -iu nobody -v $codeDir:/opt:ro -w /opt golang bash -c \"GOCACHE=/tmp/go-build-cache go run Main.go\"";
-        docker_it($cmd, $input, $result['output'], $result['error'], $result['runningTime']);
-        unlink($codeDir . 'Main.go');
+        file_put_contents($bindPath . DIRECTORY_SEPARATOR . $mainFile, $code);
+        $result = $this->dockerRun($image, $bindPath, 'bash -c "GOCACHE=/tmp/go-build-cache go run ' . $mainFile .'"', $input);
         return success($result);
     }
 
     function java(string $code, ?string $input): Response
     {
-        $result = [
-            'output' => '',
-            'error' => '',
-            'runningTime' => 0,
-        ];
+        $image = 'openjdk';
+        $bindPath = $this->getOrCreateDirectory(DIRECTORY_SEPARATOR . __FUNCTION__ . '/id');
+        $mainFile = 'Main.java';
         $code = base64_decode($code);
-        $codeDir = runtime_path('/cache/code/java/id/');
-        if (!is_dir($codeDir)) {
-            mkdir($codeDir, 0777, true);
-        }
-        file_put_contents($codeDir . 'Main.java', $code);
-        $cmd = "docker run --rm -iu nobody -v $codeDir:/opt:ro -w /opt openjdk bash -c \"java Main.java\"";
-        docker_it($cmd, $input, $result['output'], $result['error'], $result['runningTime']);
-        unlink($codeDir . 'Main.java');
+        file_put_contents($bindPath . DIRECTORY_SEPARATOR . $mainFile, $code);
+        $result = $this->dockerRun($image, $bindPath, 'java ' . $mainFile, $input);
         return success($result);
     }
 
     function javascript(string $code, ?string $input): Response
     {
-        $result = [
-            'output' => '',
-            'error' => '',
-            'runningTime' => 0,
-        ];
+        $image = 'node';
+        $bindPath = $this->getOrCreateDirectory(DIRECTORY_SEPARATOR . __FUNCTION__ . '/id');
+        $mainFile = 'Main.js';
         $code = base64_decode($code);
-        $codeDir = runtime_path('/cache/code/javascript/id/');
-        if (!is_dir($codeDir)) {
-            mkdir($codeDir, 0777, true);
-        }
-        file_put_contents($codeDir . 'Main.js', $code);
-        $cmd = "docker run --rm -iu nobody -v $codeDir:/opt:ro -w /opt node bash -c \"node Main.js\"";
-        docker_it($cmd, $input, $result['output'], $result['error'], $result['runningTime']);
-        unlink($codeDir . 'Main.js');
+        file_put_contents($bindPath . DIRECTORY_SEPARATOR . $mainFile, $code);
+        $result = $this->dockerRun($image, $bindPath, 'node ' . $mainFile, $input);
         return success($result);
     }
 
     function typescript(string $code, ?string $input): Response
+    {
+        $image = 'useparagon/ts-node';
+        $bindPath = $this->getOrCreateDirectory(DIRECTORY_SEPARATOR . __FUNCTION__ . '/id');
+        $mainFile = 'Main.ts';
+        $code = base64_decode($code);
+        file_put_contents($bindPath . DIRECTORY_SEPARATOR . $mainFile, $code);
+        $result = $this->dockerRun($image, $bindPath, 'ts-node ' . $mainFile, $input);
+        return success($result);
+    }
+
+    protected function dockerRun(string $image, string $bindPath, string $cmd, ?string $input): array
     {
         $result = [
             'output' => '',
             'error' => '',
             'runningTime' => 0,
         ];
-        $code = base64_decode($code);
-        $codeDir = runtime_path('/cache/code/typescript/id/');
+        $cmd = "docker run --rm -iu nobody -v $bindPath:/opt:ro -w /opt $image $cmd";
+        docker_it($cmd, $input, $result['output'], $result['error'], $result['runningTime']);
+        deleteDirectory($bindPath);
+        return $result;
+    }
+
+    protected function getOrCreateDirectory($path): string
+    {
+        $codeDir = runtime_path($this->code_cache_path . $path);
         if (!is_dir($codeDir)) {
             mkdir($codeDir, 0777, true);
         }
-        file_put_contents($codeDir . 'Main.ts', $code);
-        $cmd = "docker run --rm -iu nobody -v $codeDir:/opt:ro -w /opt useparagon/ts-node ts-node Main.ts";
-        docker_it($cmd, $input, $result['output'], $result['error'], $result['runningTime']);
-        unlink($codeDir . 'Main.ts');
-        return success($result);
+        return $codeDir;
     }
+
 }

@@ -9,7 +9,7 @@
           <list>
             <DockerVolumeBindingImpl>
               <option name="containerPath" value="/opt" />
-              <option name="hostPath" value="E:\workerman\webman-mvc" />
+              <option name="hostPath" value="E:\workerman\code-running" />
             </DockerVolumeBindingImpl>
           </list>
         </option>
