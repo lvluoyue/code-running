@@ -21,6 +21,6 @@ return [
     'request_class' => Request::class,
     'public_path' => base_path() . DIRECTORY_SEPARATOR . 'public',
     'runtime_path' => base_path(false) . DIRECTORY_SEPARATOR . 'runtime',
-    'controller_suffix' => env('SERVER_APP_CONTROLLER_SUFFIX', 'Controller'),
+    'controller_suffix' => env('SERVER_APP_CONTROLLER_SUFFIX', 'IndexController'),
     'controller_reuse' => env('SERVER_APP_CONTROLLER_REUSE', true),
 ];

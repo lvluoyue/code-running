@@ -15,7 +15,8 @@ return [
     ],
     // 扫描排除的路径 支持通配符: *
     'exclude_paths' => [
-        'app/model'
+        'app/model',
+        'app/command'
     ],
     // 路由设置
     'route' => [

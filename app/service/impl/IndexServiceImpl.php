@@ -7,15 +7,15 @@ use app\service\IndexService;
 use DI\Attribute\Inject;
 use support\Db;
 use support\Response;
-use Webman\Route;
+use Webman\Context;
 use Workbunny\WebmanCoroutine\Utils\Coroutine\Coroutine;
 use Workbunny\WebmanCoroutine\Utils\WaitGroup\WaitGroup;
 use Workerman\Protocols\Http\Chunk;
 use Workerman\Protocols\Http\ServerSentEvents;
 use Workerman\Timer;
 use Workerman\Worker;
+use function Workbunny\WebmanCoroutine\event_loop;
 use function \Workbunny\WebmanCoroutine\sleep;
-use function Workbunny\WebmanCoroutine\is_coroutine_env;
 
 #[Component]
 class IndexServiceImpl implements IndexService
@@ -32,7 +32,7 @@ class IndexServiceImpl implements IndexService
             'PHP版本：' . PHP_VERSION,
             'workerClass：' . config("process.$appName.workerClass"),
             'workerman版本：' . Worker::VERSION,
-            'event库：' . Worker::getEventLoop()::class
+            'event库：' . (Worker::$eventLoopClass?: event_loop())
         ]);
     }
 

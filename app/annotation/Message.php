@@ -6,7 +6,7 @@ namespace app\annotation;
 class Message
 {
 
-    public function __construct(public $message)
+    public function __construct(public string $message)
     {
     }
 }

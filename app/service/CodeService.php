@@ -18,4 +18,10 @@ interface CodeService {
 
     function typescript(string $code, ?string $input): Response;
 
+    function gcc(string $code, ?string $input): Response;
+
+    function gcc_cpp(string $code, ?string $input): Response;
+
+    function rust(string $code, ?string $input): Response;
+
 }

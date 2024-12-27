@@ -5,12 +5,13 @@ namespace app\controller;
 use app\service\IndexService;
 use DI\Attribute\Inject;
 use LinFly\Annotation\Attributes\Route\GetMapping;
+use LinFly\Annotation\Attributes\Route\Middleware;
 use LinFly\Annotation\Attributes\Route\RequestMapping;
 use support\Request;
 use support\Response;
 
-//#[Middleware(\app\middleware\testMiddleware::class)]
-class Controller
+#[Middleware(\app\middleware\testMiddleware::class)]
+class IndexController
 {
     #[Inject]
     private readonly IndexService $indexService;

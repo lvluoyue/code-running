@@ -13,11 +13,13 @@ if(!isset($MessageType)) {
 if (!function_exists('message')) {
     function message(\app\utils\ResultCode $code, mixed $data, ?string $message = null): \support\Response
     {
-        if(!isset($message)) {
-            $reflection = new ReflectionEnum($code);
-            $reflectionConstant = $reflection->getReflectionConstant($code->name);
-            $attributes = current($reflectionConstant->getAttributes(Message::class));
+        $reflection = new ReflectionEnum($code);
+        $reflectionConstant = $reflection->getReflectionConstant($code->name);
+        $attributes = current($reflectionConstant->getAttributes(Message::class));
+        if($message) {
             $message = $attributes->newInstance()->message . '，' . $message;
+        }else {
+            $message = $attributes->newInstance()->message;
         }
         return json(['code' => $code->value, 'message' => $message, 'data' => $data]);
     }
@@ -33,7 +35,7 @@ if (!function_exists('success')) {
 if (!function_exists('error')) {
     function error(string $data): \support\Response
     {
-        return message(ResultCode::ERROR, $data);
+        return message(ResultCode::ERROR, null, $data);
     }
 }
 

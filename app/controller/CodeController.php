@@ -54,4 +54,22 @@ class CodeController
     {
         return $this->codeService->typescript($code, $input);
     }
+
+    #[PostMapping]
+    public function c(Request $request, string $code, ?string $input = null): Response
+    {
+        return $this->codeService->gcc($code, $input);
+    }
+
+    #[PostMapping]
+    public function c2(Request $request, string $code, ?string $input = null): Response
+    {
+        return $this->codeService->gcc_cpp($code, $input);
+    }
+
+    #[PostMapping]
+    public function rust(Request $request, string $code, ?string $input = null): Response
+    {
+        return $this->codeService->rust($code, $input);
+    }
 }

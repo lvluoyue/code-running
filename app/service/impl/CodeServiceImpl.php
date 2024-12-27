@@ -78,6 +78,49 @@ class CodeServiceImpl implements CodeService
         return success($result);
     }
 
+    function gcc(string $code, ?string $input): Response
+    {
+        $image = 'gcc';
+        $bindPath = $this->getOrCreateDirectory(DIRECTORY_SEPARATOR . __FUNCTION__ . '/id');
+        $mainFile = 'Main.c';
+        $code = base64_decode($code);
+        file_put_contents($bindPath . DIRECTORY_SEPARATOR . $mainFile, $code);
+        $result = $this->dockerRun($image, $bindPath, '/bin/bash -c "gcc ' . $mainFile . ' -o Main && ./Main"', $input);
+        return success($result);
+    }
+
+    function gcc_cpp(string $code, ?string $input): Response
+    {
+        $image = 'gcc';
+        $bindPath = $this->getOrCreateDirectory(DIRECTORY_SEPARATOR . __FUNCTION__ . '/id');
+        $mainFile = 'Main.cpp';
+        $code = base64_decode($code);
+        file_put_contents($bindPath . DIRECTORY_SEPARATOR . $mainFile, $code);
+        $result = $this->dockerRun($image, $bindPath, '/bin/bash -c "gcc ' . $mainFile . ' -lstdc++ -o Main && ./Main"', $input);
+        return success($result);
+    }
+
+    function rust(string $code, ?string $input): Response
+    {
+        $image = 'rust';
+        $bindPath = $this->getOrCreateDirectory(DIRECTORY_SEPARATOR . __FUNCTION__ . '/id');
+        $mainFile = 'Main.rs';
+        $txt = <<<Cargo
+[package]
+name = "hello_world" # the name of the package
+version = "0.1.0"    # the current version, obeying semver
+
+[[bin]]
+name = "hello_world"
+path = "Main.rs"
+Cargo;
+        file_put_contents($bindPath . DIRECTORY_SEPARATOR . 'Cargo.toml', $txt);
+        $code = base64_decode($code);
+        file_put_contents($bindPath . DIRECTORY_SEPARATOR . $mainFile, $code);
+        $result = $this->dockerRun($image, $bindPath, '/bin/bash -c "cargo run --quiet"', $input);
+        return success($result);
+    }
+
     protected function dockerRun(string $image, string $bindPath, string $cmd, ?string $input): array
     {
         $result = [
@@ -85,7 +128,8 @@ class CodeServiceImpl implements CodeService
             'error' => '',
             'runningTime' => 0,
         ];
-        $cmd = "docker run --rm -iu nobody -v $bindPath:/opt:ro -w /opt $image $cmd";
+        ///opt:ro
+        $cmd = "docker run --rm -iu nobody -v $bindPath:/opt -w /opt $image $cmd";
         docker_it($cmd, $input, $result['output'], $result['error'], $result['runningTime']);
         deleteDirectory($bindPath);
         return $result;

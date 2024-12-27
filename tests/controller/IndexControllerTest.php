@@ -29,9 +29,4 @@ class IndexControllerTest extends TestCase
         self::assertIsObject($this->controller->index('index'));
     }
 
-    #[Test]
-    public function testIndex1()
-    {
-        self::assertIsObject($this->controller->index('index'));
-    }
 }
