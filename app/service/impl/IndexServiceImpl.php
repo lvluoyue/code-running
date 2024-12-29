@@ -2,9 +2,10 @@
 
 namespace app\service\impl;
 
-use app\annotation\Component;
+use app\annotation\Service;
 use app\service\IndexService;
 use DI\Attribute\Inject;
+use Docker\DockerClientFactory;
 use support\Db;
 use support\Response;
 use Webman\Context;
@@ -16,8 +17,9 @@ use Workerman\Timer;
 use Workerman\Worker;
 use function Workbunny\WebmanCoroutine\event_loop;
 use function \Workbunny\WebmanCoroutine\sleep;
+use Docker\Docker;
 
-#[Component]
+#[Service]
 class IndexServiceImpl implements IndexService
 {
     #[Inject("TEST_ABC")]
@@ -25,6 +27,14 @@ class IndexServiceImpl implements IndexService
 
     public function index(string $v): Response
     {
+
+        $docker = Docker::create();
+        $containers = $docker->containerList();
+        print_r($containers);
+
+        foreach ($containers as $container) {
+            var_dump($container->getNames());
+        }
         $appName =  env('SERVER_APP_NAME', 'webman');
         return success([
             'app名称：' . $appName,

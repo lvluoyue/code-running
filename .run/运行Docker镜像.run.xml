@@ -11,6 +11,10 @@
               <option name="containerPath" value="/opt" />
               <option name="hostPath" value="E:\workerman\code-running" />
             </DockerVolumeBindingImpl>
+            <DockerVolumeBindingImpl>
+              <option name="containerPath" value="/var/run/docker.sock" />
+              <option name="hostPath" value="/var/run/docker.sock" />
+            </DockerVolumeBindingImpl>
           </list>
         </option>
       </settings>

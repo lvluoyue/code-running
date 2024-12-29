@@ -10,8 +10,10 @@ use LinFly\Annotation\Attributes\Route\PostMapping;
 use LinFly\Annotation\Validate\Validate;
 use support\Request;
 use support\Response;
+use Webman\Annotation\Middleware;
 
 #[Controller("/code")]
+#[Middleware(\app\middleware\AccessToken::class, \app\middleware\ActionLock::class)]
 #[Validate(params: '$post', validate: CodeValidate::class)]
 class CodeController
 {
