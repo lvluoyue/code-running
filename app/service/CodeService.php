@@ -6,22 +6,22 @@ use support\Response;
 use Workerman\Protocols\Http\Chunk;
 
 interface CodeService {
-    function php(string $code, ?string $input): Response;
+    function php(string $code, ?string $stdin): array;
 
-    function python(string $code, ?string $input): Response;
+    function python(string $code, ?string $stdin): array;
 
-    function golang(string $code, ?string $input): Response;
+    function golang(string $code, ?string $stdin): array;
 
-    function java(string $code, ?string $input): Response;
+    function java(string $code, ?string $stdin): array;
 
-    function javascript(string $code, ?string $input): Response;
+    function javascript(string $code, ?string $stdin): array;
 
-    function typescript(string $code, ?string $input): Response;
+    function typescript(string $code, ?string $stdin): array;
 
-    function gcc(string $code, ?string $input): Response;
+    function gcc(string $code, ?string $stdin): array;
 
-    function gcc_cpp(string $code, ?string $input): Response;
+    function gcc_cpp(string $code, ?string $stdin): array;
 
-    function rust(string $code, ?string $input): Response;
+    function rust(string $code, ?string $stdin): array;
 
 }

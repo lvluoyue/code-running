@@ -5,10 +5,8 @@ namespace app\service\impl;
 use app\annotation\Service;
 use app\service\IndexService;
 use DI\Attribute\Inject;
-use Docker\DockerClientFactory;
 use support\Db;
 use support\Response;
-use Webman\Context;
 use Workbunny\WebmanCoroutine\Utils\Coroutine\Coroutine;
 use Workbunny\WebmanCoroutine\Utils\WaitGroup\WaitGroup;
 use Workerman\Protocols\Http\Chunk;
@@ -17,7 +15,6 @@ use Workerman\Timer;
 use Workerman\Worker;
 use function Workbunny\WebmanCoroutine\event_loop;
 use function \Workbunny\WebmanCoroutine\sleep;
-use Docker\Docker;
 
 #[Service]
 class IndexServiceImpl implements IndexService
@@ -27,22 +24,14 @@ class IndexServiceImpl implements IndexService
 
     public function index(string $v): Response
     {
-
-        $docker = Docker::create();
-        $containers = $docker->containerList();
-        print_r($containers);
-
-        foreach ($containers as $container) {
-            var_dump($container->getNames());
-        }
-        $appName =  env('SERVER_APP_NAME', 'webman');
+        $appName = env('SERVER_APP_NAME', 'webman');
         return success([
             'app名称：' . $appName,
             '操作系统：' . php_uname('s') . ' ' . php_uname('r'),
             'PHP版本：' . PHP_VERSION,
             'workerClass：' . config("process.$appName.workerClass"),
             'workerman版本：' . Worker::VERSION,
-            'event库：' . (Worker::$eventLoopClass?: event_loop())
+            'event库：' . (Worker::$eventLoopClass ?: event_loop())
         ]);
     }
 
@@ -81,7 +70,7 @@ class IndexServiceImpl implements IndexService
         });
 
         //tcp关闭连接后立刻停止协程
-        $connection->onClose = function () use($timer_id, &$coroutine) {
+        $connection->onClose = function () use ($timer_id, &$coroutine) {
             Timer::del($timer_id);
             foreach ($coroutine as $weakMap) {
                 print_r($weakMap->origin());
@@ -125,7 +114,7 @@ class IndexServiceImpl implements IndexService
 
 
         //tcp关闭连接后立刻停止协程
-        $connection->onClose = function () use($timer_id, &$coroutine) {
+        $connection->onClose = function () use ($timer_id, &$coroutine) {
             Timer::del($timer_id);
             foreach ($coroutine as $weakMap) {
                 $weakMap->kill($weakMap);

@@ -10,16 +10,18 @@ use LinFly\Annotation\Attributes\Route\RequestMapping;
 use support\Request;
 use support\Response;
 
-#[Middleware(\app\middleware\testMiddleware::class)]
 class IndexController
 {
     #[Inject]
     private readonly IndexService $indexService;
 
+    #[Inject('ACCESS_TOKEN')]
+    private readonly string $access_token;
+
     #[RequestMapping("")]
-    public function index(Request $request,#[Inject("TEST_ABCD")] $abc): Response
+    public function index(Request $request): Response
     {
-        return $this->indexService->index($abc);
+        return view('index/index', ['access_token' => $this->access_token]);
     }
 
     #[GetMapping]
@@ -44,12 +46,6 @@ class IndexController
     public function hello(int $id): string
     {
         return 'hello' . $id;
-    }
-
-    #[RequestMapping]
-    public function view(Request $request): Response
-    {
-        return view('index/view', ['name' => 'webman']);
     }
 
     #[RequestMapping]

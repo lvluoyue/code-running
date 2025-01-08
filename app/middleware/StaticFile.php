@@ -14,6 +14,7 @@
 
 namespace app\middleware;
 
+use DI\Attribute\Inject;
 use Webman\MiddlewareInterface;
 use Webman\Http\Response;
 use Webman\Http\Request;
@@ -24,12 +25,27 @@ use Webman\Http\Request;
  */
 class StaticFile implements MiddlewareInterface
 {
+
+    #[Inject('ACCESS_TOKEN')]
+    private readonly string $access_token;
+
     public function process(Request $request, callable $next): Response
     {
         // Access to files beginning with. Is prohibited
         if (strpos($request->path(), '/.') !== false) {
             return response('<h1>403 forbidden</h1>', 403);
         }
+
+        $authorization = $request->header("Authorization");
+
+        if(!$authorization || !str_starts_with($authorization, 'Basic ') ||
+            ! ($authorization = base64_decode(substr($authorization, 6), true)) ||
+            $authorization != 'admin:' . $this->access_token) {
+            return  response('<h1>401 unauthorized</h1>', 401) ->withHeaders([
+                'WWW-Authenticate' => 'Basic realm="Access Restricted"',
+            ]);
+        }
+
         /** @var Response $response */
         $response = $next($request);
         // Add cross domain HTTP header
