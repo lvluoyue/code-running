@@ -12,7 +12,7 @@ use support\Request;
 use support\Response;
 use Webman\Annotation\Middleware;
 
-#[Controller("/code")]
+#[Controller("/api/code")]
 #[Middleware(\app\middleware\AccessToken::class, \app\middleware\ActionLock::class)]
 #[Validate('$post', CodeValidate::class, 'language')]
 class CodeController

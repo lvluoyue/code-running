@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <title>代码运行测试</title>
@@ -8,6 +8,7 @@
         body {
             background: #f0f0f0;
         }
+
         .app {
             max-width: 800px;
             margin: 0 auto;
@@ -15,6 +16,7 @@
             flex-direction: column;
             gap: 15px;
         }
+
         .container {
             background: white;
             padding: 10px;
@@ -33,6 +35,7 @@
             resize: none;
             touch-action: none;
         }
+
         #result {
             font-size: 18px;
             color: white;
@@ -56,16 +59,7 @@
         <label for="code">标准输入：</label>
         <textarea style="height: 80px" id="stdin" placeholder="请输入标准输入"></textarea>
         <div>
-            <label>
-                选择语言：
-                <select name="language">
-                    <option value="php">PHP</option>
-                    <option value="c">C</option>
-                    <option value="cpp">C++</option>
-                    <option value="java">Java</option>
-                    <option value="python">Python</option>
-                </select>
-            </label>
+            <label>选择语言：<select name="language"></select></label>
             <button id="run">运行</button>
             <button id="reset">重置</button>
         </div>
@@ -76,35 +70,42 @@
     </div>
 </div>
 <script>
-    let editcode = document.getElementById('code');
-    let stdin = document.getElementById('stdin');
-    let language = document.querySelector('select[name="language"]');
-    let result = document.getElementById('result');
-    let run = document.getElementById('run');
-    let reset = document.getElementById('reset');
+    const editcode = document.getElementById('code');
+    const stdin = document.getElementById('stdin');
+    const language = document.querySelector('select[name="language"]');
+    const result = document.getElementById('result');
+    const run = document.getElementById('run');
+    const reset = document.getElementById('reset');
+
+    let list = [];
+
+    addEventListener('load', async () => {
+        editcode.focus();
+        list = (await (await fetch('/api/list')).json()).data
+        language.innerHTML = list.map(item => `<option value="${item.value}">${item.lang}</option>`).join('');
+        code.value = atob(list[0].demoCode);
+    })
+
+    language.addEventListener('change', event => {
+        const selectedOption = list[event.target.selectedIndex];
+        code.value = atob(selectedOption.demoCode);
+    })
 
     run.onclick = async () => {
-        let request = {
-            code: btoa(editcode.value),
-            stdin: stdin.value,
-            language: language.value
-        }
-
         const response = await fetch('/api/run?access_token=<?=$access_token?>', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(request)
+            body: JSON.stringify({
+                code: btoa(editcode.value),
+                stdin: stdin.value,
+                language: language.value
+            })
         })
-        const { code, message, data} = await response.json();
-        if (code !== 200) {
-            result.innerHTML = message;
-            result.style.background = 'red';
-            return;
-        }
-        if (data.stderr) {
-            result.innerHTML = data.stderr;
+        const {code, message, data} = await response.json();
+        if (code !== 200 || data.stderr) {
+            result.innerHTML = data.stderr || message;
             result.style.background = 'red';
             return;
         }

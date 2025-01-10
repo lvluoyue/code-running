@@ -26,7 +26,7 @@
   "require": {
     "php": ">=8.2",
     "ext-pdo": "*",
-    "workerman/workerman": "^v5.0.0-rc.3",
+    "workerman/workerman": "^v5.0.0",
     "workerman/webman-framework": "^1.6.8",
     "linfly/annotation": "^2.0.1",
     "workbunny/webman-coroutine": "^1.3",

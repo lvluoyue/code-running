@@ -35,23 +35,4 @@ class IndexController
     {
         return $this->indexService->chunked();
     }
-
-    #[GetMapping]
-    public function mysql(Request $request): Response
-    {
-        return $this->indexService->mysql();
-    }
-
-    #[GetMapping("{id:\d+}")]
-    public function hello(int $id): string
-    {
-        return 'hello' . $id;
-    }
-
-    #[RequestMapping]
-    public function json(Request $request): Response
-    {
-        return json(['code' => 0, 'msg' => 'ok']);
-    }
-
 }
