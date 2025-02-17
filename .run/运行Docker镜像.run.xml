@@ -3,13 +3,13 @@
     <deployment type="docker-image">
       <settings>
         <option name="imageTag" value="luoyueapi/webman-mvc" />
-        <option name="containerName" value="webman" />
+        <option name="containerName" value="code" />
         <option name="commandLineOptions" value="--network=host" />
         <option name="volumeBindings">
           <list>
             <DockerVolumeBindingImpl>
               <option name="containerPath" value="/opt" />
-              <option name="hostPath" value="E:\workerman\code-running" />
+              <option name="hostPath" value="E:\workerman\code-running-demo" />
             </DockerVolumeBindingImpl>
             <DockerVolumeBindingImpl>
               <option name="containerPath" value="/var/run/docker.sock" />

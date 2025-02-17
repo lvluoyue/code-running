@@ -4,6 +4,7 @@ namespace app\process;
 
 use DI\Attribute\Inject;
 use Illuminate\Database\Eloquent\Model;
+use Luoyue\WebmanMvcCore\annotation\core\parser\EventParser;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionEnum;
@@ -30,36 +31,8 @@ class Http extends App
      */
     public function onWorkerStart($worker)
     {
-        $appName = env("SERVER_APP_NAME", "webman");
-        $lockFile = runtime_path("windows/start_$appName.php");
-        if(env('SERVER_OPEN_BROWSER', false) && DIRECTORY_SEPARATOR !== '/' && time() - filemtime($lockFile) <= 3) {
-            exec('start http://127.0.0.1:' .  env('SERVER_APP_PROT', 8787));
-        }
         parent::onWorkerStart($worker);
-    }
-
-    /**
-     * OnMessage.
-     * @param TcpConnection|mixed $connection
-     * @param Request|mixed $request
-     * @return null
-     * @throws Throwable
-     */
-    public function onMessage($connection, $request)
-    {
-        parent::onMessage($connection, $request);
-    }
-    /**
-     * Send.
-     * @param TcpConnection|mixed $connection
-     * @param mixed|Response $response
-     * @param Request|mixed $request
-     * @return void
-     */
-    protected static function send($connection, $response, $request)
-    {
-//        print_r(Context::get());
-        parent::send($connection, $response, $request);
+        class_exists(EventParser::class) && EventParser::EventHandler();
     }
 
     /**
